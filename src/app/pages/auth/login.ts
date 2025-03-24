@@ -7,6 +7,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
+import { AuthService } from './auth.service';
 
 @Component({
     selector: 'app-login',
@@ -69,18 +70,17 @@ export class Login {
     email: string = '';
     password: string = '';
     checked: boolean = false;
-
-    constructor(private router: Router) {}
-
+  
+    constructor(private authService: AuthService, private router: Router) {}
+  
     onSignIn() {
-        // Logique de connexion ici
-        console.log('Email:', this.email);
-        console.log('Password:', this.password);
-        console.log('Remember me:', this.checked);
-
-        // Effectuer la logique d'authentification ici, comme appeler un service d'authentification
-        // Si l'authentification réussie :
-        
-        this.router.navigate(['/dashboard']); // Rediriger vers la page d'accueil (ou la page souhaitée après login)
+      this.authService.login(this.email, this.password).subscribe({
+        next: (res: { token: string; role: string; }) => {
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('role', res.role);
+          this.router.navigate(['/dashboard']);
+        },
+        error: () => alert('Identifiants invalides')
+      });
     }
-}
+  }
