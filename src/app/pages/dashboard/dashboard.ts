@@ -6,11 +6,10 @@ import { RevenueStreamWidget } from './components/revenuestreamwidget';
 
 @Component({
     selector: 'app-dashboard',
-    imports: [ BestSellingWidget, RevenueStreamWidget, NotificationsWidget],
+    imports: [  RevenueStreamWidget, NotificationsWidget],
     template: `
         <div class="grid grid-cols-12 gap-8">
             <div class="col-span-12 xl:col-span-6">
-                <app-best-selling-widget />
             </div>
             <div class="col-span-12 xl:col-span-6">
                 <app-revenue-stream-widget />
