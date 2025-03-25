@@ -32,7 +32,7 @@ export class AppMenu implements OnInit {
           label: 'Admin',
           items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
-            { label: 'Admin Panel', icon: 'pi pi-fw pi-cogs', routerLink: ['/admin'] }
+            { label: 'Ajouter un service', icon: 'pi pi-fw pi-cogs', routerLink: ['/ajoutService'] }
           ]
         },
         {
