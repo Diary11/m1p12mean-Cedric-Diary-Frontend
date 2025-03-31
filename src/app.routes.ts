@@ -4,17 +4,21 @@ import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Notfound } from './app/pages/notfound/notfound';
 import { AuthGuard } from './app/pages/auth/auth.guard';
 import { RoleGuard } from './app/pages/auth/role.guard';
-import { Reparation } from './app/pages/reparation/reparation';
+import { ReparationComponent } from './app/pages/reparation/reparation';
 import { InsertServiceWidget } from './app/pages/auth/insertServiceWidget';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
   {
+    path: 'reparation/calendrier',
+    loadComponent: () => import('./app/pages/reparation/components/calendrier/calendrier.component').then(m => m.CalendrierComponent)
+  },
+  {
     path: '',
     component: AppLayout,
     children: [
       { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard] },
-      { path: 'reparation', component: Reparation, canActivate: [AuthGuard] },
+      { path: 'reparation', component: ReparationComponent, canActivate: [AuthGuard] },
       { path: 'admin', component: Dashboard, canActivate: [AuthGuard, RoleGuard] }, // Admin only
       { path: 'ajoutService', component: InsertServiceWidget, canActivate: [AuthGuard, RoleGuard] }, // Déplacé ici
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
