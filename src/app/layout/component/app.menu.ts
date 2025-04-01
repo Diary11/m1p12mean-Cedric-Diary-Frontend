@@ -5,6 +5,9 @@ import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
 import { AuthService } from '../../pages/auth/auth.service';
 
+import { MatDialog } from '@angular/material/dialog';
+import { Scheduler2DialogComponent } from '../../components/scheduler2-dialog/scheduler2-dialog.component';
+
 @Component({
   selector: 'app-menu',
   standalone: true,
@@ -16,12 +19,15 @@ import { AuthService } from '../../pages/auth/auth.service';
         <li *ngIf="item.separator" class="menu-separator"></li>
       </ng-container>
     </ul>
+    <button mat-raised-button color="primary" (click)="openSchedulerDialog()">
+      Select Time Slots
+    </button>
   `
 })
 export class AppMenu implements OnInit {
   model: MenuItem[] = [];
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, public dialog: MatDialog) {}
 
   ngOnInit() {
     const role = this.authService.getUserRole();  // Récupère le rôle de l'utilisateur
@@ -46,7 +52,8 @@ export class AppMenu implements OnInit {
           label: 'User',
           items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
-            { label: 'Demande Réparation', icon: 'pi pi-fw pi-home', routerLink: ['/reparation'] }
+            { label: 'Demande Réparation', icon: 'pi pi-fw pi-home', routerLink: ['/reparation'] },
+            { label: 'Calendirer', icon: 'pi pi-fw pi-home', routerLink: ['/reparation/calendrier'] }
           ]
         }
       ];
@@ -70,4 +77,17 @@ export class AppMenu implements OnInit {
       ];
     }
   }
+
+  openSchedulerDialog(): void {
+    const dialogRef = this.dialog.open(Scheduler2DialogComponent, {
+      width: '450px',
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Selected Time Slots:', result);
+      }
+    });
+  }
+
 }
