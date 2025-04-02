@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { jqxSchedulerModule } from 'jqwidgets-ng/jqxscheduler';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-calendrier',
@@ -40,6 +41,8 @@ import { jqxSchedulerModule } from 'jqwidgets-ng/jqxscheduler';
   `
 })
 export class CalendrierComponent {
+  private apiUrl = `${environment.apiUrl}/api/reparations`;
+  
   date: any = new jqx.date(new Date());
   matricule = '';
   services: any[] = [];
@@ -118,9 +121,8 @@ onCellClick(event: any): void {
       endDate: this.selectedEndDate
     };
 
-    console.log("📦 Données à envoyer :", payload);
 
-    this.http.post('http://localhost:5000/api/reparations/create', payload, {
+    this.http.post(`${this.apiUrl}/create`, payload, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'
@@ -132,7 +134,7 @@ onCellClick(event: any): void {
         this.router.navigate(['/reparation']);
       },
       error: (err) => {
-        console.error("❌ Erreur :", err);
+        console.error(" Erreur :", err);
         alert("Erreur lors de l'enregistrement.");
       }
     });

@@ -4,6 +4,7 @@ import { DragDropModule, CdkDragDrop, transferArrayItem } from '@angular/cdk/dra
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 interface Service {
   _id: string;
@@ -82,6 +83,9 @@ interface Service {
   `
 })
 export class FormulaireWidgetComponent implements OnInit {
+ 
+  private apiUrl = `${environment.apiUrl}/api/services`;
+  
   allServices: Service[] = [];
   selectedServices: Service[] = [];
   visibleProducts: Service[] = [];
@@ -92,7 +96,7 @@ export class FormulaireWidgetComponent implements OnInit {
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
-    this.http.get<Service[]>('http://localhost:5000/api/services').subscribe({
+    this.http.get<Service[]>(`${this.apiUrl}`).subscribe({
       next: (data) => {
         this.allServices = data;
         this.filter();
@@ -117,26 +121,6 @@ export class FormulaireWidgetComponent implements OnInit {
     if (!this.allServices.find(s => s._id === removed._id)) this.allServices.push(removed);
     this.filter();
   }
-
-  // envoyer() {
-  //   const payload = {
-  //     matricule: this.matricule,
-  //     services: this.selectedServices.map(s => s._id)
-  //   };
-  
-  //   this.http.post('http://localhost:5000/api/reparations/create', payload, {
-  //     headers: new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token')}` })
-  //   }).subscribe({
-  //     next: () => {
-  //       alert('Réparation créée avec succès');
-  //       this.router.navigate(['/reparation']);
-  //     },
-  //     error: (err) => {
-  //       console.error("Erreur de création :", err);
-  //       alert('Échec de création de la réparation');
-  //     }
-  //   });
-  // }
   
   envoyer() {
     if (!this.matricule || this.selectedServices.length === 0) {

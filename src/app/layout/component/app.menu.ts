@@ -19,9 +19,6 @@ import { Scheduler2DialogComponent } from '../../components/scheduler2-dialog/sc
         <li *ngIf="item.separator" class="menu-separator"></li>
       </ng-container>
     </ul>
-    <button mat-raised-button color="primary" (click)="openSchedulerDialog()">
-      Select Time Slots
-    </button>
   `
 })
 export class AppMenu implements OnInit {
@@ -53,7 +50,7 @@ export class AppMenu implements OnInit {
           items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
             { label: 'Demande Réparation', icon: 'pi pi-fw pi-home', routerLink: ['/reparation'] },
-            { label: 'Calendirer', icon: 'pi pi-fw pi-home', routerLink: ['/reparation/calendrier'] }
+            { label: 'Calendirer', icon: 'pi pi-fw pi-home', routerLink: ['/reparation/client-calendrier'] }
           ]
         }
       ];
@@ -78,16 +75,5 @@ export class AppMenu implements OnInit {
     }
   }
 
-  openSchedulerDialog(): void {
-    const dialogRef = this.dialog.open(Scheduler2DialogComponent, {
-      width: '450px',
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('Selected Time Slots:', result);
-      }
-    });
-  }
 
 }

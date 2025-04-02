@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 interface Reparation {
   _id: string;
@@ -18,8 +19,7 @@ interface Reparation {
   template: `
     <div class="card p-4 bg-white rounded shadow-sm">
       <h3 class="text-xl font-semibold mb-4">Mes Réparations</h3>
-      <button (click)="onNouvelleReparation.emit()" class="mb-4 px-4 py-2 bg-blue-600 text-white rounded">
-        ➕ Nouvelle réparation
+      <button (click)="onNouvelleReparation.emit()" class="mb-4 px-4 py-2 bg-blue-600 text-white rounded"> Nouvelle réparation
       </button>
 
       <table class="w-full border border-collapse text-sm">
@@ -44,6 +44,8 @@ interface Reparation {
   `
 })
 export class HistoriqueWidgetComponent implements OnInit {
+ 
+  private apiUrl = `${environment.apiUrl}/api/reparations`;
 
   @Output() onNouvelleReparation = new EventEmitter<void>();  
   reparations: Reparation[] = [];
@@ -51,7 +53,7 @@ export class HistoriqueWidgetComponent implements OnInit {
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
-    this.http.get<Reparation[]>('http://localhost:5000/api/reparations/my-reparations', {
+    this.http.get<Reparation[]>(`${this.apiUrl}/my-reparations`, {
       headers: new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token')}` })
     }).subscribe({
       next: (data) => this.reparations = data
