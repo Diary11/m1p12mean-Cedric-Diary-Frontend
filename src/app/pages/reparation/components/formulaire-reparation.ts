@@ -118,26 +118,43 @@ export class FormulaireWidgetComponent implements OnInit {
     this.filter();
   }
 
+  // envoyer() {
+  //   const payload = {
+  //     matricule: this.matricule,
+  //     services: this.selectedServices.map(s => s._id)
+  //   };
+  
+  //   this.http.post('http://localhost:5000/api/reparations/create', payload, {
+  //     headers: new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token')}` })
+  //   }).subscribe({
+  //     next: () => {
+  //       alert('Réparation créée avec succès');
+  //       this.router.navigate(['/reparation']);
+  //     },
+  //     error: (err) => {
+  //       console.error("Erreur de création :", err);
+  //       alert('Échec de création de la réparation');
+  //     }
+  //   });
+  // }
+  
   envoyer() {
+    if (!this.matricule || this.selectedServices.length === 0) {
+      alert("Veuillez remplir le matricule et sélectionner des services.");
+      return;
+    }
+  
     const payload = {
       matricule: this.matricule,
-      services: this.selectedServices.map(s => s._id)
+      services: this.selectedServices,
+      total: this.getTotalPrix(),
+      duration: this.getTotalDuree() // en heures
     };
   
-    this.http.post('http://localhost:5000/api/reparations/create', payload, {
-      headers: new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token')}` })
-    }).subscribe({
-      next: () => {
-        alert('Réparation créée avec succès');
-        this.router.navigate(['/reparation']);
-      },
-      error: (err) => {
-        console.error("Erreur de création :", err);
-        alert('Échec de création de la réparation');
-      }
-    });
+    localStorage.setItem('reparationPayload', JSON.stringify(payload));
+    this.router.navigate(['/reparation/calendrier']);
   }
-  
+      
 
   getTotalPrix(): number {
     return this.selectedServices.reduce((sum, s) => sum + (s.prix || 0), 0);

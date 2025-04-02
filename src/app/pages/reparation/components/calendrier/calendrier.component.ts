@@ -1,29 +1,37 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { jqxSchedulerComponent, jqxSchedulerModule } from 'jqwidgets-ng/jqxscheduler';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { jqxSchedulerModule } from 'jqwidgets-ng/jqxscheduler';
 
 @Component({
   selector: 'app-calendrier',
   standalone: true,
-  imports: [jqxSchedulerModule],
+  imports: [CommonModule, jqxSchedulerModule],
   template: `
     <div class="p-6">
       <h2 class="text-xl font-bold mb-4">Choisissez une date de réparation</h2>
+
       <jqxScheduler
-        #schedulerReference
         [theme]="'fluent'"
         [date]="date"
         [width]="getWidth()"
         [height]="600"
         [source]="dataAdapter"
-        [showLegend]="true"
-        [view]="'weekView'"
         [appointmentDataFields]="appointmentDataFields"
         [resources]="resources"
         [views]="views"
-        [editDialog]="true"
-        [localization]="frLocalization">
+        [view]="'weekView'"
+        [editDialog]="false"
+        [localization]="frLocalization"
+        (onCellClick)="onCellClick($event)">
       </jqxScheduler>
+
+      <div *ngIf="selectedStartDate" class="mt-4 text-green-700 text-sm">
+        Créneau choisi :
+        <strong>{{ selectedStartDate | date:'shortTime' }}</strong> →
+        <strong>{{ selectedEndDate | date:'shortTime' }}</strong>
+      </div>
 
       <button (click)="validerDate()" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded">
         Valider la date choisie
@@ -31,87 +39,111 @@ import { jqxSchedulerComponent, jqxSchedulerModule } from 'jqwidgets-ng/jqxsched
     </div>
   `
 })
-export class CalendrierComponent implements AfterViewInit {
-  @ViewChild('schedulerReference') scheduler!: jqxSchedulerComponent;
-
+export class CalendrierComponent {
   date: any = new jqx.date(new Date());
   matricule = '';
   services: any[] = [];
   total = 0;
   duration = 0;
 
-  constructor(private router: Router) {
-    const nav = this.router.getCurrentNavigation();
-    const state = nav?.extras?.state;
-    if (state) {
-      this.matricule = state['matricule'];
-      this.services = state['services'];
-      this.total = state['total'];
-      this.duration = state['duration'];
+  selectedStartDate: Date | null = null;
+  selectedEndDate: Date | null = null;
+
+  constructor(private router: Router, private http: HttpClient) {
+    const data = localStorage.getItem('reparationPayload');
+    if (data) {
+      const payload = JSON.parse(data);
+      this.matricule = payload.matricule;
+      this.services = payload.services;
+      this.total = payload.total;
+      this.duration = payload.duration;
+    } else {
+      alert("Aucune donnée trouvée. Retour au formulaire.");
+      this.router.navigate(['/reparation/formulaire']);
     }
   }
 
-  ngAfterViewInit(): void {
-    if (this.scheduler) {
-      this.scheduler.ensureAppointmentVisible('id1');
-    }
+onCellClick(event: any): void {
+  const clickedDate: Date = event.args.date.toDate();
+  const endDate: Date = new Date(clickedDate.getTime() + this.duration * 60 * 60 * 1000);
+
+  const now = new Date();
+  if (clickedDate < now) {
+    alert("Impossible de sélectionner une date dans le passé.");
+    return;
   }
+
+  const isSameDay =
+    clickedDate.getDate() === endDate.getDate() &&
+    clickedDate.getMonth() === endDate.getMonth() &&
+    clickedDate.getFullYear() === endDate.getFullYear();
+
+  if (!isSameDay || clickedDate.getHours() < 8 || endDate.getHours() > 17) {
+    alert("Sélection invalide. Les créneaux doivent être entre 8h et 17h.");
+    return;
+  }
+
+  this.selectedStartDate = clickedDate;
+  this.selectedEndDate = endDate;
+
+  this.source.localData = this.source.localData.filter((item: any) => !item.fake);
+
+  this.source.localData.push({
+    id: "selected-slot",
+    subject: "Créneau sélectionné",
+    calendar: "selection",
+    start: clickedDate,
+    end: endDate,
+    fake: true
+  });
+
+  this.dataAdapter = new jqx.dataAdapter(this.source);
+
+  console.log("✅ Créneau affiché :", clickedDate, "→", endDate);
+}
+
 
   validerDate() {
-    const appointments = this.scheduler.getAppointments();
-    if (!appointments || appointments.length === 0) {
-      alert("Sélectionnez un créneau dans le calendrier.");
+    if (!this.selectedStartDate || !this.selectedEndDate) {
+      alert("Cliquez sur une cellule du calendrier.");
       return;
     }
-
-    const slot: any = appointments[appointments.length - 1];
 
     const payload = {
       matricule: this.matricule,
       services: this.services.map(s => s._id),
       total: this.total,
       duration: this.duration,
-      startDate: slot.from,
-      endDate: slot.to
+      startDate: this.selectedStartDate,
+      endDate: this.selectedEndDate
     };
 
-    console.log("🟢 Données prêtes à envoyer :", payload);
-    // Ici tu peux faire l'envoi HTTP ou rediriger
+    console.log("📦 Données à envoyer :", payload);
+
+    this.http.post('http://localhost:5000/api/reparations/create', payload, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      })
+    }).subscribe({
+      next: () => {
+        localStorage.removeItem('reparationPayload');
+        alert('✅ Réparation créée avec succès !');
+        this.router.navigate(['/reparation']);
+      },
+      error: (err) => {
+        console.error("❌ Erreur :", err);
+        alert("Erreur lors de l'enregistrement.");
+      }
+    });
   }
 
   getWidth(): any {
-    if (document.body.offsetWidth < 850) {
-      return '90%';
-    }
-    return 850;
+    return document.body.offsetWidth < 850 ? '90%' : 850;
   }
 
   generateAppointments(): any[] {
-    return [
-      {
-        id: "id1",
-        description: "George apporte le projecteur pour la présentation.",
-        location: "",
-        subject: "Réunion projet trimestriel",
-        calendar: "atelier",
-        start: new Date(2025, 10, 23, 9, 0, 0),
-        end: new Date(2025, 10, 23, 16, 0, 0)
-      },
-      {
-        id: "id2",
-        subject: "Réunion IT",
-        calendar: "atelier",
-        start: new Date(2025, 10, 24, 10, 0, 0),
-        end: new Date(2025, 10, 24, 15, 0, 0)
-      },
-      {
-        id: "id3",
-        subject: "Formation Réseaux sociaux",
-        calendar: "atelier",
-        start: new Date(2025, 10, 27, 11, 0, 0),
-        end: new Date(2025, 10, 27, 13, 0, 0)
-      }
-    ];
+    return [];
   }
 
   source: any = {
@@ -144,12 +176,34 @@ export class CalendrierComponent implements AfterViewInit {
   resources: any = {
     colorScheme: 'scheme05',
     dataField: 'calendar',
-    source: new jqx.dataAdapter(this.source)
+    source: new jqx.dataAdapter({
+      dataType: 'array',
+      dataFields: [{ name: 'calendar', type: 'string' }],
+      localData: [
+        { calendar: "atelier" },
+        { calendar: "selection" } // 🟢 Créneau sélectionné
+      ]
+    })
   };
 
-  views: any[] = ['dayView', 'weekView', 'monthView'];
+  views: any[] = [
+    {
+      type: 'dayView',
+      timeRuler: {
+        scaleStartHour: 8,
+        scaleEndHour: 17
+      }
+    },
+    {
+      type: 'weekView',
+      timeRuler: {
+        scaleStartHour: 8,
+        scaleEndHour: 17
+      }
+    },
+    'monthView'
+  ];
 
-  // ✅ Localisation en français
   frLocalization: any = {
     firstDay: 1,
     days: {

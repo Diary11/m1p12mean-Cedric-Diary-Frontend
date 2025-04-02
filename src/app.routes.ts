@@ -21,8 +21,8 @@ export const appRoutes: Routes = [
       { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard] },
       { path: 'reparation', component: ReparationComponent, canActivate: [AuthGuard] },
       { path: 'reparation/calendrier', component: CalendrierComponent, canActivate: [AuthGuard] },
-      { path: 'admin', component: Dashboard, canActivate: [AuthGuard, RoleGuard] }, // Admin only
-      { path: 'ajoutService', component: InsertServiceWidget, canActivate: [AuthGuard, RoleGuard] }, // Déplacé ici
+      { path: 'admin', component: Dashboard, canActivate: [AuthGuard, RoleGuard] }, 
+      { path: 'ajoutService', component: InsertServiceWidget, canActivate: [AuthGuard, RoleGuard] }, 
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
     ]
   },
