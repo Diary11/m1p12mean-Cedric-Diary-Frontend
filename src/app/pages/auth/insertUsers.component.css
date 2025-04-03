@@ -1,0 +1,29 @@
+/* Animation des champs */
+.transition {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus visible */
+.focus\:ring-2:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.min-w-full {
+  min-width: 100%;
+}
+
+.border-b {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
