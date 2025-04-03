@@ -1,9 +1,12 @@
 import {
   zindexutils
-} from "./chunk-NMOYQVAO.js";
+} from "./chunk-6222G4ZR.js";
+import {
+  InputText
+} from "./chunk-RDURGCKA.js";
 import {
   AutoFocus
-} from "./chunk-LHOCJCVS.js";
+} from "./chunk-OZBG56QJ.js";
 import {
   ConnectedOverlayScrollHandler,
   DomHandler
@@ -12,24 +15,20 @@ import {
   EyeIcon,
   EyeSlashIcon,
   TimesIcon
-} from "./chunk-2OO6T4LF.js";
-import {
-  InputText
-} from "./chunk-R6X4HYDO.js";
-import {
-  NG_VALUE_ACCESSOR
-} from "./chunk-P73PIM3P.js";
+} from "./chunk-WPIWTA47.js";
 import {
   BaseComponent
-} from "./chunk-4QNKO4SX.js";
-import "./chunk-BK667OKO.js";
+} from "./chunk-I2HHGG6P.js";
+import "./chunk-ZJZL2JCF.js";
 import {
-  BaseStyle,
+  BaseStyle
+} from "./chunk-R6BCE6Z6.js";
+import {
   OverlayService,
   PrimeTemplate,
   SharedModule,
   TranslationKeys
-} from "./chunk-TUTEX2IB.js";
+} from "./chunk-6UUSSKWP.js";
 import {
   absolutePosition,
   addClass,
@@ -38,15 +37,18 @@ import {
   isTouchDevice,
   relativePosition,
   removeClass
-} from "./chunk-YTCWFW72.js";
+} from "./chunk-GG4QQIVH.js";
 import {
   animate,
   style,
   transition,
   trigger
-} from "./chunk-J2347JD2.js";
-import "./chunk-CWYBPNCF.js";
-import "./chunk-NJ25EVEJ.js";
+} from "./chunk-K2SJP6TZ.js";
+import {
+  NG_VALUE_ACCESSOR
+} from "./chunk-EAMDQL7O.js";
+import "./chunk-5OGPSL7A.js";
+import "./chunk-X6H3JEIU.js";
 import {
   CommonModule,
   NgClass,
@@ -54,7 +56,7 @@ import {
   NgStyle,
   NgTemplateOutlet,
   isPlatformBrowser
-} from "./chunk-UMAXZX7C.js";
+} from "./chunk-UQEO47S7.js";
 import {
   ChangeDetectionStrategy,
   Component,
@@ -118,10 +120,10 @@ import {
   ɵɵtext,
   ɵɵtextInterpolate,
   ɵɵviewQuery
-} from "./chunk-SAS3ZIMR.js";
-import "./chunk-4N4GOYJH.js";
-import "./chunk-5OPE3T2R.js";
-import "./chunk-FHTVLBLO.js";
+} from "./chunk-23ZTJ6RP.js";
+import "./chunk-KT3NRA3D.js";
+import "./chunk-5AZMPBFP.js";
+import "./chunk-FMZF26QI.js";
 import "./chunk-WDMUDEB6.js";
 
 // node_modules/primeng/fesm2022/primeng-password.mjs
@@ -474,6 +476,7 @@ var theme = ({
     height: ${dt("icon.size")};
 }
 
+.p-password:has(.p-password-toggle-mask-icon) .p-password-clear-icon,
 .p-password:has(.p-password-toggle-mask-icon) .p-password-input {
     padding-inline-end: calc((${dt("form.field.padding.x")} * 2) + ${dt("icon.size")});
 }

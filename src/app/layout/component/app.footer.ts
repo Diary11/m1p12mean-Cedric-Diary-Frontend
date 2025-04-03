@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
     standalone: true,
     selector: 'app-footer',
     template: `<div class="layout-footer">
-        By RASAMIMANANA Diary Paricia et Kasy Emiliano Cedric
+        By RASAMIMANANA Diary Paricia et TONGALAZA Kasy Emiliano Cedric
     </div>`
 })
 export class AppFooter {}

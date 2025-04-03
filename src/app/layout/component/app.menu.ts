@@ -32,7 +32,9 @@ export class AppMenu implements OnInit {
           label: 'Admin',
           items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
-            { label: 'Ajouter un service', icon: 'pi pi-fw pi-cogs', routerLink: ['/ajoutService'] }
+            { label: 'Gestion des mecanicien', icon: 'pi pi-fw pi-cogs', routerLink: ['/ajoutMecano'] },
+            { label: 'Gestion des services', icon: 'pi pi-fw pi-cogs', routerLink: ['/ajoutService'] },
+            { label: 'Stat Reparation', icon: 'pi pi-fw pi-cogs', routerLink: ['/statreparation'] }
           ]
         },
         {
@@ -46,7 +48,9 @@ export class AppMenu implements OnInit {
           label: 'User',
           items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
-            { label: 'Demande Réparation', icon: 'pi pi-fw pi-home', routerLink: ['/reparation'] }
+            { label: 'Demande Réparation', icon: 'pi pi-fw pi-home', routerLink: ['/reparation'] },
+            { label: 'Payement ', icon: 'pi pi-fw pi-home', routerLink: ['/payement'] }
+
           ]
         }
       ];

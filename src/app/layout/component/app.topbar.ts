@@ -33,7 +33,7 @@ import { LayoutService } from '../service/layout.service';
                         />
                     </g>
                 </svg>
-                <span>SAKAI</span>
+                <span>Didy and Kasy's Auto</span>
             </a>
         </div>
 

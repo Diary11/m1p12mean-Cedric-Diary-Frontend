@@ -1,0 +1,36 @@
+<div class="p-4">
+  <button (click)="toggleViewMode()" class="mb-4 p-2 bg-blue-500 text-white rounded">
+    Basculer en vue {{ viewMode === 'day' ? 'mensuelle' : 'journalière' }}
+  </button>
+
+  <div *ngIf="stats.length > 0">
+    <h3 class="text-xl font-bold mb-2">
+      Statistiques {{ viewMode === 'day' ? 'journalières' : 'mensuelles' }}
+    </h3>
+    
+    <table class="min-w-full border">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="p-2 border">Date</th>
+          <th class="p-2 border">Réparations</th>
+          <th class="p-2 border">Revenu (Ar)</th>
+          <th class="p-2 border">Véhicules uniques</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stat of stats" class="border hover:bg-gray-50">
+          <td class="p-2 border">
+            {{ viewMode === 'day' ? (stat.date | date:'dd/MM/yyyy') : (stat.date | date:'MM/yyyy') }}
+          </td>
+          <td class="p-2 border text-center">{{ stat.count }}</td>
+          <td class="p-2 border text-right">{{ stat.totalRevenue | number }}</td>
+          <td class="p-2 border text-center">{{ stat.uniqueVehicules }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="stats.length === 0" class="text-center p-8 text-gray-500">
+    Aucune donnée disponible
+  </div>
+</div>
