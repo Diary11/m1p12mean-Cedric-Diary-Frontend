@@ -32,7 +32,9 @@
                             }
                         ],
                         "styles": [
-                            "src/styles.scss"
+                          "@angular/material/prebuilt-themes/azure-blue.css",
+                          "./node_modules/jqwidgets-ng/jqwidgets/styles/jqx.base.css",                    
+                          "src/styles.scss"
                         ],
                         "scripts": []
                     },
