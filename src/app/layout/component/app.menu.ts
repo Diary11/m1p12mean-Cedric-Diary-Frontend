@@ -5,9 +5,6 @@ import { MenuItem } from 'primeng/api';
 import { AppMenuitem } from './app.menuitem';
 import { AuthService } from '../../pages/auth/auth.service';
 
-import { MatDialog } from '@angular/material/dialog';
-import { Scheduler2DialogComponent } from '../../components/scheduler2-dialog/scheduler2-dialog.component';
-
 @Component({
   selector: 'app-menu',
   standalone: true,
@@ -24,7 +21,7 @@ import { Scheduler2DialogComponent } from '../../components/scheduler2-dialog/sc
 export class AppMenu implements OnInit {
   model: MenuItem[] = [];
 
-  constructor(private authService: AuthService, public dialog: MatDialog) {}
+  constructor(private authService: AuthService) {}
 
   ngOnInit() {
     const role = this.authService.getUserRole();  // Récupère le rôle de l'utilisateur
@@ -35,7 +32,9 @@ export class AppMenu implements OnInit {
           label: 'Admin',
           items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
-            { label: 'Ajouter un service', icon: 'pi pi-fw pi-cogs', routerLink: ['/ajoutService'] }
+            { label: 'Gestion des mecanicien', icon: 'pi pi-fw pi-cogs', routerLink: ['/ajoutMecano'] },
+            { label: 'Gestion des services', icon: 'pi pi-fw pi-cogs', routerLink: ['/ajoutService'] },
+            { label: 'Stat Reparation', icon: 'pi pi-fw pi-cogs', routerLink: ['/statreparation'] }
           ]
         },
         {
@@ -50,7 +49,8 @@ export class AppMenu implements OnInit {
           items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
             { label: 'Demande Réparation', icon: 'pi pi-fw pi-home', routerLink: ['/reparation'] },
-            { label: 'Calendirer', icon: 'pi pi-fw pi-home', routerLink: ['/reparation/client-calendrier'] }
+            { label: 'Payement ', icon: 'pi pi-fw pi-home', routerLink: ['/payement'] }
+
           ]
         }
       ];
@@ -74,6 +74,4 @@ export class AppMenu implements OnInit {
       ];
     }
   }
-
-
 }
