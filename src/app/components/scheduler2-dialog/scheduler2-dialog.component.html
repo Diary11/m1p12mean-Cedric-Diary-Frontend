@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Select Time Slots</h2>
+<mat-dialog-content>
+  <div class="time-slot-container">
+    <div *ngFor="let slot of timeSlots" class="time-slot"
+         [class.selected]="isSelected(slot)"
+         [class.disabled]="slot.disabled"
+         (click)="toggleSelection(slot)">
+      {{ slot.time }}
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button color="primary" (click)="onConfirm()" [disabled]="selectedSlots.length === 0">
+    Confirm
+  </button>
+</mat-dialog-actions>
