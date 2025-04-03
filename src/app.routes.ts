@@ -5,20 +5,30 @@ import { Notfound } from './app/pages/notfound/notfound';
 import { AuthGuard } from './app/pages/auth/auth.guard';
 import { RoleGuard } from './app/pages/auth/role.guard';
 import { InsertUsers } from './app/pages/auth/InsertUsers';
-import { Reparation } from './app/pages/reparation/reparation';
 import { InsertServiceWidget } from './app/pages/auth/insertServiceWidget';
 import { StatistiqueReparation } from './app/pages/auth/statistiqueReparation';
 import { Accueil } from './app/pages/auth/accueil'; 
+import { ReparationComponent } from './app/pages/reparation/reparation';
+import { CalendrierComponent } from './app/pages/reparation/components/calendrier/calendrier.component';
+import { ClientCalendrierComponent } from './app/pages/reparation/components/client-calendrier.component/client-calendrier.component.component';
+
 
 export const appRoutes: Routes = [
   { path: '', component: Accueil }, // Page d'accueil à la racine
   //{ path: '', redirectTo: '/auth/login', pathMatch: 'full' },
+  /*{
+    path: 'reparation/calendrier',
+    loadComponent: () => import('./app/pages/reparation/components/calendrier/calendrier.component').then(m => m.CalendrierComponent)
+  },*/
+  
   {
     path: '',
     component: AppLayout,
     children: [
       { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard] },
-      { path: 'reparation', component: Reparation, canActivate: [AuthGuard] },
+      { path: 'reparation', component: ReparationComponent, canActivate: [AuthGuard] },
+      { path: 'reparation/client-calendrier', component: ClientCalendrierComponent, canActivate: [AuthGuard] },
+      { path: 'reparation/calendrier', component: CalendrierComponent, canActivate: [AuthGuard] },
       { path: 'admin', component: Dashboard, canActivate: [AuthGuard, RoleGuard] },  
       { path: 'ajoutService', component: InsertServiceWidget, canActivate: [AuthGuard, RoleGuard] },  
       { path: 'ajoutMecano', component: InsertUsers, canActivate: [AuthGuard, RoleGuard],data: { mode: 'mecanicien' }}, 

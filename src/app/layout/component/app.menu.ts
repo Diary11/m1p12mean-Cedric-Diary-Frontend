@@ -49,6 +49,7 @@ export class AppMenu implements OnInit {
           items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/dashboard'] },
             { label: 'Demande Réparation', icon: 'pi pi-fw pi-home', routerLink: ['/reparation'] },
+            { label: 'Calendirer', icon: 'pi pi-fw pi-home', routerLink: ['/reparation/client-calendrier'] },
             { label: 'Payement ', icon: 'pi pi-fw pi-home', routerLink: ['/payement'] }
 
           ]
