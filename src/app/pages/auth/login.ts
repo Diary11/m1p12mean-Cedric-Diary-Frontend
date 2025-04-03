@@ -11,6 +11,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { delay } from 'rxjs/operators'; // Ajoutez ceci
 import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
 import { AuthService } from './auth.service';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
     selector: 'app-login',
@@ -25,8 +27,10 @@ import { AuthService } from './auth.service';
         RouterModule,
         RippleModule,
         ProgressSpinnerModule,
-        AppFloatingConfigurator,
+        AppFloatingConfigurator, 
+        ToastModule
       ],
+    providers: [MessageService],
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'] 
 })
@@ -39,7 +43,7 @@ export class Login {
     errorMessage: string = '';
     isLoading: boolean = false;
   
-    constructor(private authService: AuthService, private router: Router) {}
+    constructor(private authService: AuthService, private router: Router,private messageService: MessageService) {}
   
     onSignIn() {
       this.isLoading = true; // Active le spinner
@@ -50,10 +54,16 @@ export class Login {
           this.router.navigate(['/dashboard']);
         },
         error: () => {
-          alert('Identifiants invalides');
+          // alert('Identifiants invalides');
           this.isLoading = false; // Désactive le spinner en cas d'erreur
           this.errorMessage = 'Nom ou mot de passe incorrect';
 
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Identifiants invalides',
+            detail: 'Nom ou mot de passe incorrect',
+            life: 4000
+          });
         },
         complete: () => {
           this.isLoading = false; // Désactive le spinner après la requête (succès ou échec)

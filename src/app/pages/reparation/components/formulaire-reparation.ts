@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 interface Service {
   _id: string;
@@ -14,17 +16,20 @@ interface Service {
   duree: number;
 }
 
-
 @Component({
   selector: 'app-formulaire-widget',
   standalone: true,
-  imports: [CommonModule, DragDropModule, FormsModule],
+  imports: [CommonModule, DragDropModule, FormsModule, ToastModule],
+  providers: [MessageService],
   template: `
-    <div class="card p-4 bg-green-100 rounded min-h-[200px]">
+    <p-toast></p-toast>
+    <div class="card p-6 bg-white rounded shadow-sm">
       <h3 class="text-xl font-semibold mb-4">Nouvelle réparation</h3>
 
-      <input [(ngModel)]="matricule" name="matricule" class="..." placeholder="Matricule" />
-
+      <div class="mb-4">
+        <label for="matricule" class="block mb-1 font-medium">Matricule</label>
+        <input id="matricule" [(ngModel)]="matricule" name="matricule" class="w-full p-2 border rounded" placeholder="Entrer le matricule" />
+      </div>
 
       <div class="grid grid-cols-2 gap-4">
         <!-- Dropzone -->
@@ -34,8 +39,10 @@ interface Service {
           [cdkDropListData]="selectedServices"
           [cdkDropListConnectedTo]="['serviceList']"
           (cdkDropListDropped)="drop($event)"
-          class="p-4 bg-green-200 rounded min-h-[150px]">
+          class="p-4 bg-gray-100 rounded min-h-[150px]">
+
           <div *ngIf="selectedServices.length === 0" class="text-gray-500">Glissez des services ici</div>
+
           <div *ngFor="let item of selectedServices; let i = index" cdkDrag class="p-2 bg-white rounded mb-2 shadow-sm">
             <div class="flex justify-between items-start gap-2">
               <div>
@@ -46,7 +53,8 @@ interface Service {
               <button (click)="remove(i)" class="text-red-500 hover:text-red-700 text-lg">❌</button>
             </div>
           </div>
-          <div class="mt-4 p-2 bg-green-300 rounded text-sm">
+
+          <div class="mt-4 p-2 bg-blue-100 rounded text-sm">
             <div class="font-medium">
               Total durée : {{ getTotalDuree() | number:'1.1-1' }} Heure(s)
             </div>
@@ -54,8 +62,6 @@ interface Service {
               Total prix : {{ getTotalPrix() | number:'1.2-2' }} Ar
             </div>
           </div>
-
-
         </div>
 
         <!-- Liste des services -->
@@ -73,19 +79,17 @@ interface Service {
               <div class="text-sm text-gray-500">Durée : {{ item.duree | number:'1.1-1' }} Heure</div>
               <div class="text-sm text-gray-500">Prix : {{ item.prix | number:'1.2-2' }} Ar</div>
             </div>
-
           </div>
         </div>
       </div>
 
-      <button (click)="envoyer()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">Envoyer</button>
+      <button (click)="envoyer()" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded">Envoyer</button>
     </div>
   `
 })
 export class FormulaireWidgetComponent implements OnInit {
- 
   private apiUrl = `${environment.apiUrl}/api/services`;
-  
+
   allServices: Service[] = [];
   selectedServices: Service[] = [];
   visibleProducts: Service[] = [];
@@ -93,7 +97,7 @@ export class FormulaireWidgetComponent implements OnInit {
   matricule = '';
   clientId = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router, private messageService: MessageService) {}
 
   ngOnInit() {
     this.http.get<Service[]>(`${this.apiUrl}`).subscribe({
@@ -121,32 +125,34 @@ export class FormulaireWidgetComponent implements OnInit {
     if (!this.allServices.find(s => s._id === removed._id)) this.allServices.push(removed);
     this.filter();
   }
-  
+
   envoyer() {
     if (!this.matricule || this.selectedServices.length === 0) {
-      alert("Veuillez remplir le matricule et sélectionner des services.");
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Champs requis',
+        detail: 'Veuillez remplir le matricule et sélectionner des services.',
+        life: 4000
+      });
       return;
     }
-  
+
     const payload = {
       matricule: this.matricule,
       services: this.selectedServices,
       total: this.getTotalPrix(),
-      duration: this.getTotalDuree() // en heures
+      duration: this.getTotalDuree()
     };
-  
+
     localStorage.setItem('reparationPayload', JSON.stringify(payload));
     this.router.navigate(['/reparation/calendrier']);
   }
-      
 
   getTotalPrix(): number {
     return this.selectedServices.reduce((sum, s) => sum + (s.prix || 0), 0);
   }
-  
+
   getTotalDuree(): number {
     return this.selectedServices.reduce((sum, s) => sum + (s.duree || 0), 0);
   }
-  
-  
 }

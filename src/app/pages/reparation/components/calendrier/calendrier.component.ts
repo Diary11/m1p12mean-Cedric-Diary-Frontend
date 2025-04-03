@@ -4,12 +4,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { jqxSchedulerModule } from 'jqwidgets-ng/jqxscheduler';
 import { environment } from '../../../../../environments/environment';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-calendrier',
   standalone: true,
-  imports: [CommonModule, jqxSchedulerModule],
+  imports: [CommonModule, jqxSchedulerModule, ToastModule],
+  providers: [MessageService],
   template: `
+    <p-toast></p-toast>
     <div class="p-6">
       <h2 class="text-xl font-bold mb-4">Choisissez une date de réparation</h2>
 
@@ -42,7 +46,7 @@ import { environment } from '../../../../../environments/environment';
 })
 export class CalendrierComponent {
   private apiUrl = `${environment.apiUrl}/api/reparations`;
-  
+
   date: any = new jqx.date(new Date());
   matricule = '';
   services: any[] = [];
@@ -52,7 +56,7 @@ export class CalendrierComponent {
   selectedStartDate: Date | null = null;
   selectedEndDate: Date | null = null;
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient, private messageService: MessageService) {
     const data = localStorage.getItem('reparationPayload');
     if (data) {
       const payload = JSON.parse(data);
@@ -61,54 +65,73 @@ export class CalendrierComponent {
       this.total = payload.total;
       this.duration = payload.duration;
     } else {
-      alert("Aucune donnée trouvée. Retour au formulaire.");
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Informations manquantes',
+        detail: `Veuillez d'abord remplir le formulaire.`,
+        life: 5000
+      });
       this.router.navigate(['/reparation/formulaire']);
     }
   }
 
-onCellClick(event: any): void {
-  const clickedDate: Date = event.args.date.toDate();
-  const endDate: Date = new Date(clickedDate.getTime() + this.duration * 60 * 60 * 1000);
+  onCellClick(event: any): void {
+    const clickedDate: Date = event.args.date.toDate();
+    const endDate: Date = new Date(clickedDate.getTime() + this.duration * 60 * 60 * 1000);
 
-  const now = new Date();
-  if (clickedDate < now) {
-    alert("Impossible de sélectionner une date dans le passé.");
-    return;
+    const now = new Date();
+    if (clickedDate < now) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Créneau passé',
+        detail: 'Vous ne pouvez pas sélectionner une date dans le passé.',
+        life: 4000
+      });
+      return;
+    }
+
+    const isSameDay =
+      clickedDate.getDate() === endDate.getDate() &&
+      clickedDate.getMonth() === endDate.getMonth() &&
+      clickedDate.getFullYear() === endDate.getFullYear();
+
+    if (!isSameDay || clickedDate.getHours() < 8 || endDate.getHours() > 17) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Plage horaire invalide',
+        detail: 'Sélectionnez un créneau complet entre 08h et 17h.',
+        life: 4000
+      });
+      return;
+    }
+
+    this.selectedStartDate = clickedDate;
+    this.selectedEndDate = endDate;
+
+    this.source.localData = this.source.localData.filter((item: any) => !item.fake);
+
+    this.source.localData.push({
+      id: "selected-slot",
+      subject: "Créneau sélectionné",
+      calendar: "selection",
+      start: clickedDate,
+      end: endDate,
+      fake: true
+    });
+
+    this.dataAdapter = new jqx.dataAdapter(this.source);
+
+    console.log("✅ Créneau affiché :", clickedDate, "→", endDate);
   }
-
-  const isSameDay =
-    clickedDate.getDate() === endDate.getDate() &&
-    clickedDate.getMonth() === endDate.getMonth() &&
-    clickedDate.getFullYear() === endDate.getFullYear();
-
-  if (!isSameDay || clickedDate.getHours() < 8 || endDate.getHours() > 17) {
-    alert("Sélection invalide. Les créneaux doivent être entre 8h et 17h.");
-    return;
-  }
-
-  this.selectedStartDate = clickedDate;
-  this.selectedEndDate = endDate;
-
-  this.source.localData = this.source.localData.filter((item: any) => !item.fake);
-
-  this.source.localData.push({
-    id: "selected-slot",
-    subject: "Créneau sélectionné",
-    calendar: "selection",
-    start: clickedDate,
-    end: endDate,
-    fake: true
-  });
-
-  this.dataAdapter = new jqx.dataAdapter(this.source);
-
-  console.log("✅ Créneau affiché :", clickedDate, "→", endDate);
-}
-
 
   validerDate() {
     if (!this.selectedStartDate || !this.selectedEndDate) {
-      alert("Cliquez sur une cellule du calendrier.");
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Aucun créneau',
+        detail: 'Veuillez sélectionner une plage horaire dans le calendrier.',
+        life: 4000
+      });
       return;
     }
 
@@ -121,7 +144,6 @@ onCellClick(event: any): void {
       endDate: this.selectedEndDate
     };
 
-
     this.http.post(`${this.apiUrl}/create`, payload, {
       headers: new HttpHeaders({
         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -130,13 +152,27 @@ onCellClick(event: any): void {
     }).subscribe({
       next: () => {
         localStorage.removeItem('reparationPayload');
-        alert('✅ Réparation créée avec succès !');
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Créneau confirmé',
+          detail: 'Votre demande de réparation a été enregistrée avec succès.',
+          life: 3000
+        });
         this.router.navigate(['/reparation']);
       },
       error: (err) => {
-        console.error(" Erreur :", err);
-        alert("Erreur lors de l'enregistrement.");
+        console.error("Erreur :", err);
+      
+        const message = err.error?.error || "Une erreur inconnue est survenue.";
+      
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Échec de la création',
+          detail: message,
+          life: 5000
+        });
       }
+      
     });
   }
 
@@ -183,7 +219,7 @@ onCellClick(event: any): void {
       dataFields: [{ name: 'calendar', type: 'string' }],
       localData: [
         { calendar: "atelier" },
-        { calendar: "selection" } // 🟢 Créneau sélectionné
+        { calendar: "selection" }
       ]
     })
   };
