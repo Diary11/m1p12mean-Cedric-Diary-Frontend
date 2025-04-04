@@ -7,6 +7,6 @@ export class PlanningService {
   constructor(private http: HttpClient) {}
 
   getOccupiedSlots(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:5000/api/reparations/occupied');
+    return this.http.get<any[]>('https://m1p12mean-diary-emiliano-backend.onrender.com/api/reparations/occupied');
   }
 }

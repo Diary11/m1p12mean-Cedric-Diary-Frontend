@@ -60,16 +60,16 @@ export class Login implements OnInit {
   private setContetenuFormulaire() {
     switch(this.role) {
         case 'client':
-            this.username = 'Gracia Kasy';
-            this.password = 'gracia';
+            this.username = 'Didy Paty';
+            this.password = 'didy';
             break;
         case 'mecano':
             this.username = 'Cedric Kasy';
             this.password = 'cedric';
             break;
         case 'admin':
-            this.username = 'Emile Kasy';
-            this.password = 'emile';
+            this.username = 'Rakoto Jean';
+            this.password = 'jean';
             break;
         default:
             this.username = '';
